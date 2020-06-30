@@ -321,7 +321,7 @@ module strips() {
           sphere(r=shell_thick);
         }
       translate([0, 0, inner_z/2])
-        cube([inner_x, inner_y + 2*shell_thick - 2, 30], center=true);
+        cube([inner_x, inner_y, 30], center=true);
     }
     union() {
       translate([-12.5, 0, 0])
