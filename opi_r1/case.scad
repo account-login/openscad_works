@@ -24,14 +24,14 @@ col_height = 5;
 wall_height = 21.5;
 // 2 rj45
 rj45_y = 33.3;
-rj45_z = 13.5;
+rj45_z = 13.5 - 1.5;
 // from nw hole center to microusb axis
 usb_jack_pos = 3.197 + 7.600/2;
 // height of the microusb jack
 usb_jack_height = 3;
 // microusb hole size
 usb_hole_y = 10 + 2;
-usb_hole_z = 4.5 + 2;
+usb_hole_z = 5.5 + 2;
 
 // smooth
 $fn = 90;
@@ -201,6 +201,7 @@ module snap_arm() {
 }
 
 module wall_holes() {
+  board_upper_z = shell_thick + base_height + board_thick;
   // snap fit
   translate([0, -y_inner/2 - y_bot, snap_height + snap_z/2])
     rotate([90, 0, 0])
@@ -209,28 +210,29 @@ module wall_holes() {
     rotate([90, 0, 180])
       snap_cutter();
   // 2 rj45 hole
-  translate([x_inner/2 + x_right + 2, 0, shell_thick + base_height + rj45_z/2]) {
+  translate([x_inner/2 + x_right + 2, 0, board_upper_z + rj45_z/2]) {
     difference() {
       cube([10, rj45_y, rj45_z], center=true);
       col_y = 3;
       cube([20, col_y, rj45_z + 10], center=true);
     }
   }
+  // FIXME: conflict with sw column
   // antenna hole
   antenna_d = 5;
   x_move = x_inner/2 + x_right - 5;
   y_move = -rj45_y/2 - antenna_d/2;
-  translate([x_move, y_move, shell_thick + base_height])
+  translate([x_move, y_move, board_upper_z])
     cube([10, antenna_d, antenna_d]);
-  translate([x_move, y_move, shell_thick + base_height + antenna_d/2])
+  translate([x_move, y_move, board_upper_z + antenna_d/2])
     rotate([0, 90, 0])
       cylinder(h=10, r=antenna_d/2);
-  translate([x_move + 10, -rj45_y/2 - shell_thick, shell_thick + base_height + antenna_d])
+  translate([x_move + 10, -rj45_y/2 - shell_thick, board_upper_z + antenna_d])
     rotate([0, 0, -90])
       edge(10);
   // microusb hole
   usb_off = 2;
-  translate([-x_inner/2 - x_left - 5, y_inner/2 - usb_jack_pos, shell_thick + base_height + usb_jack_height/2])
+  translate([-x_inner/2 - x_left - 5, y_inner/2 - usb_jack_pos, board_upper_z + usb_jack_height/2])
     rotate([90, 0, 90])
       linear_extrude(height=10)
         offset(usb_off)
@@ -331,6 +333,7 @@ module cooling_hole_ring(w) {
 // slug height
 slug_height = 4;
 
+// FIXME: too tight
 module top_slug() {
   slug_scale = (2*shell_thick + 0.2) / (2*shell_thick);
   translate([0, 0, -slug_height])

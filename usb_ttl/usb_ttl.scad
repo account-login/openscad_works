@@ -2,8 +2,8 @@
 $fn = 100;
 epsilon = 0.0005;
 
-inner_x = 39.6;
-inner_y = 23.0;
+inner_x = 39.8 + 0.2;
+inner_y = 23.5 + 0.2;
 inner_z = 8;
 shell_thick = 2;
 board_z = 2;
@@ -90,7 +90,7 @@ module shell_bottom() {
 
 module jumper_hole_cutter() {
   translate([-inner_x/2, 0, board_z + board_thick + pin_height])
-    cube([10, 5*pin_conn_size + 0.2, pin_conn_size], center=true);
+    cube([10, 5*pin_conn_size + 0.5, pin_conn_size + 0.2], center=true);
 }
 
 module usb_cutter() {
