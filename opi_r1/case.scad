@@ -143,10 +143,11 @@ module case_top() {
     rotate([90, 0, 180])
       snap_arm();
   // slugs
-  slug_move_y = y_inner/2 + y_top - 2*shell_thick;
+  slug_gap = 0.2;
+  slug_move_y = y_inner/2 + y_top - 2*shell_thick - slug_gap;
   slug_move_z = shell_thick + wall_height;
-  slug_move_e = x_inner/2 + x_right - 2*shell_thick;
-  slug_move_w = -x_inner/2 - x_left + 2*shell_thick;
+  slug_move_e = x_inner/2 + x_right - 2*shell_thick - slug_gap;
+  slug_move_w = -x_inner/2 - x_left + 2*shell_thick + slug_gap;
   translate([slug_move_e, slug_move_y, slug_move_z])
     top_slug();
   translate([slug_move_w, slug_move_y, slug_move_z])
@@ -333,7 +334,6 @@ module cooling_hole_ring(w) {
 // slug height
 slug_height = 4;
 
-// FIXME: too tight
 module top_slug() {
   slug_scale = (2*shell_thick + 0.2) / (2*shell_thick);
   translate([0, 0, -slug_height])
