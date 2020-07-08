@@ -201,6 +201,7 @@ module snap_arm() {
       edge(snap_x);
 }
 
+// TODO: antenna hole
 module wall_holes() {
   board_upper_z = shell_thick + base_height + board_thick;
   // snap fit
@@ -218,19 +219,6 @@ module wall_holes() {
       cube([20, col_y, rj45_z + 10], center=true);
     }
   }
-  // FIXME: conflict with sw column
-  // antenna hole
-  antenna_d = 5;
-  x_move = x_inner/2 + x_right - 5;
-  y_move = -rj45_y/2 - antenna_d/2;
-  translate([x_move, y_move, board_upper_z])
-    cube([10, antenna_d, antenna_d]);
-  translate([x_move, y_move, board_upper_z + antenna_d/2])
-    rotate([0, 90, 0])
-      cylinder(h=10, r=antenna_d/2);
-  translate([x_move + 10, -rj45_y/2 - shell_thick, board_upper_z + antenna_d])
-    rotate([0, 0, -90])
-      edge(10);
   // microusb hole
   usb_off = 2;
   translate([-x_inner/2 - x_left - 5, y_inner/2 - usb_jack_pos, board_upper_z + usb_jack_height/2])
