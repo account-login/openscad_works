@@ -107,7 +107,7 @@ module case_top() {
           cooling_hole();
       }
       // text
-      font = "Source Sans Pro Black";
+      font = "Source Sans 3 Black";
       translate([0, 0, wall_height + 2*shell_thick - 0.5])
         linear_extrude(height=1) {
           translate([6.6, -25, 0])
@@ -119,10 +119,10 @@ module case_top() {
             text("R1", font=font);
           translate([2, 25, 0])
             rotate([0, 0, 180])
-              text("2020-06-29", font=font, size=4);
+              text("2020-10-31", font=font, size=4);
           translate([2, 19, 0])
             rotate([0, 0, 180])
-              text("001", font=font, size=4);
+              text("002", font=font, size=4);
         }
     }
   }
