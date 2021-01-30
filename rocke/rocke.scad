@@ -1,48 +1,66 @@
 
-board_L = 64.8;
-board_W = 56.0;
+// unit
+mil = 0.0254;
+
+// board_L = 64.8;
+board_L = 2537.00 * mil;        // 64.44
+// board_W = 56.0;
+board_W = 2205.1 * mil;         // 56.01
 board_T = 1.4;
 
-hole_D = 3.5;
-hole_edge_to_board_top = 2.0;
-hole_edge_to_board_bot = 2.0;
-hole_edge_to_board_right = 1.5;
-hole_edge_to_board_left = 2.0;
+// hole_d = 3.5;
+hole_D = 135.648 * mil;             // 3.45
+// hole_edge_to_board_top = 2.0;
+hole_edge_to_board_top = 137.9 * mil - hole_D / 2;      // 1.78
+// hole_edge_to_board_bot = 2.0;
+hole_edge_to_board_bot = 137.6 * mil - hole_D / 2;      // 1.77
+// hole_edge_to_board_right = 1.5;
+hole_edge_to_board_right = 117.0 * mil - hole_D / 2;    // 1.25
+// hole_edge_to_board_left = 2.0;
+hole_edge_to_board_left = 137.0 * mil - hole_D / 2;     // 1.76
 
 rj45_H = 14.9 - board_T;    // 13.5
 rj45_W = 34.8;
 rj45_L = 21.4;
 rj45_gap = 2.6;
 rj45_hang = 67.5 - board_L; // 2.7
-rj45_edge_to_board_bot = 7.5;
+// rj45_edge_to_board_bot = 7.5;
+rj45_edge_to_board_bot = 297.422 * mil;     // 7.55
 
-sd_W = 14.0;
-sd_L = 16.0;
+// sd_W = 14.0;
+sd_W = 551.181 * mil;  // 14.00
+// sd_L = 16.0;
+sd_L = 627.953 * mil;  // 15.95
 sd_T = 3.5 - board_T;       // 2.1
 sd_hang = 2.0;
-sd_edge_to_board_top = 6.5;
+// sd_edge_to_board_top = 6.5;
+sd_edge_to_board_top = 255.578 * mil;  // 6.49
 
 usb3_W = 5.8;
 usb3_outter_W = 7.4;
 usb3_H = 13.7;
 usb3_outter_H = 14.8;
 usb3_L = 26.0;
-usb3_edge_to_board_bot = 8.7;
-usb3_hang = 66.0 - board_L; // 1.2
+// usb3_edge_to_board_bot = 8.7;
+usb3_edge_to_board_bot = (314 / 2 + 291.461) * mil - usb3_W / 2;    // 8.49
+usb3_hang = 66.0 - board_L;     // 1.2
 
 pin_W = 2.54 * 2;
 pin_L = 50.8;   // 2.54 * 20
 pin_H = 8.6;
-pin_edge_to_board_left = 7.0;
+// pin_edge_to_board_left = 7.0;
+pin_edge_to_board_left = 328.2 * mil - 1.27;    // 7.07
 
 jack_D = 6.0;
 jack_ring_top_to_board_bottom = 6.5;
-jack_edge_to_board_top = 21.0;
+// jack_edge_to_board_top = 21.0;
+jack_edge_to_board_top = 831.2 * mil;    // 21.11
 
 typec_W = 9.0;
 typec_T = 3.2;
 typec_L = 7.5;
-typec_edge_to_board_bot = 25.7 - typec_W;
+// typec_edge_to_board_bot = 25.7 - typec_W;   // 16.7
+typec_edge_to_board_bot = (664.742 + 340.158 / 2) * mil - typec_W / 2;  // 16.70
 typec_hang = 0.4;
 
 // the origin point is at bottom left
