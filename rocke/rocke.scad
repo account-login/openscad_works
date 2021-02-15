@@ -8,7 +8,7 @@ board_L = 2537.00 * mil;        // 64.44
 board_W = 2205.1 * mil;         // 56.01
 board_T = 1.4;
 
-// hole_d = 3.5;
+// hole_D = 3.5;
 hole_D = 135.648 * mil;             // 3.45
 // hole_edge_to_board_top = 2.0;
 hole_edge_to_board_top = 137.9 * mil - hole_D / 2;      // 1.78
@@ -66,11 +66,20 @@ typec_hang = 0.4;
 // the origin point is at bottom left
 // the origin point is at the bottom of pcb
 
+
+// the position of hole center
+hx1 = hole_edge_to_board_left + hole_D / 2;
+hy1 = hole_edge_to_board_bot + hole_D / 2;
+hx2 = board_L - hole_edge_to_board_right - hole_D / 2;
+hy2 = board_W - hole_edge_to_board_top - hole_D / 2;
+hole_pos_list = [
+    [hx1, hy1],
+    [hx2, hy1],
+    [hx1, hy2],
+    [hx2, hy2],
+];
+
 module pcb() {
-    ox1 = hole_edge_to_board_left + hole_D / 2;
-    oy1 = hole_edge_to_board_bot + hole_D / 2;
-    ox2 = board_L - hole_edge_to_board_right - hole_D / 2;
-    oy2 = board_W - hole_edge_to_board_top - hole_D / 2;
     delta = 0.01;
 
     difference() {
@@ -81,25 +90,17 @@ module pcb() {
             // cube([board_L, board_W, board_T]);
             // hole pad
             color("gold") {
-                translate([ox1, oy1, -delta])
-                    cylinder(h=board_T + 2 * delta, d=6);
-                translate([ox1, oy2, -delta])
-                    cylinder(h=board_T + 2 * delta, d=6);
-                translate([ox2, oy1, -delta])
-                    cylinder(h=board_T + 2 * delta, d=6);
-                translate([ox2, oy2, -delta])
-                    cylinder(h=board_T + 2 * delta, d=6);
+                for (pos = hole_pos_list) {
+                    translate([pos[0], pos[1], -delta])
+                        cylinder(h=board_T + 2 * delta, d=6.0);
+                }
             }
         }
         // holes
-        translate([ox1, oy1, -1])
-            cylinder(h=4, d=hole_D);
-        translate([ox1, oy2, -1])
-            cylinder(h=4, d=hole_D);
-        translate([ox2, oy1, -1])
-            cylinder(h=4, d=hole_D);
-        translate([ox2, oy2, -1])
-            cylinder(h=4, d=hole_D);
+        for (pos = hole_pos_list) {
+            translate([pos[0], pos[1], -1])
+                cylinder(h=4, d=hole_D);
+        }
     }
 }
 
@@ -327,6 +328,41 @@ module case_front() {
         translate([-10, -10, -30 + case_split_z])
             cube([case_inner_L, case_inner_W, 30] + [20, 20, 0]);
     }
+    color("lightgreen")
+        front_supporter();
+}
+
+front_supp_D = 4.0;
+front_supp_W = 2.0;
+front_supp_L = 4.0;
+
+module front_supporter() {
+    inner_h = board_T / 2 - 0.1;
+    offset_v = 0.3;
+    for (pos = hole_pos_list) {
+        translate([pos[0], pos[1], board_T]) {
+            linear_extrude(case_gap_front)
+                offset(offset_v, $fn=1)
+                    square([front_supp_W, front_supp_L] - 2 * [offset_v, offset_v], center=true);
+            // cylinder(h=case_gap_front, d=front_supp_D, $fn = 16);
+        }
+        // translate([pos[0], pos[1], board_T - inner_h])
+        //     cylinder(h=inner_h, d=board_supp_inner_D, $fn=6);
+    }
+}
+
+board_supp_outer_D = 6.0;
+board_supp_inner_D = 3.2;
+board_supp_hang = 0.2;
+
+module board_supporter() {
+    outer_h = case_gap_back + case_T + board_supp_hang;
+    for (pos = hole_pos_list) {
+        translate([pos[0], pos[1], -outer_h])
+            cylinder(h=outer_h, d=board_supp_outer_D, $fn = 6);
+        translate([pos[0], pos[1], 0])
+            cylinder(h=(board_T / 2 - 0.1), d=board_supp_inner_D, $fn=6);
+    }
 }
 
 module case_back() {
@@ -338,6 +374,8 @@ module case_back() {
         typec_cutter();
         jack_cutter();
     }
+    color("lightgreen")
+        board_supporter();
 }
 
 module case() {
@@ -345,6 +383,6 @@ module case() {
     case_back();
 }
 
+case_front();
 board();
-// case_front();
-case_back();
+// case_back();
