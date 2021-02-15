@@ -73,10 +73,10 @@ hy1 = hole_edge_to_board_bot + hole_D / 2;
 hx2 = board_L - hole_edge_to_board_right - hole_D / 2;
 hy2 = board_W - hole_edge_to_board_top - hole_D / 2;
 hole_pos_list = [
-    [hx1, hy1],
-    [hx2, hy1],
-    [hx1, hy2],
-    [hx2, hy2],
+    [hx1, hy1],     // lb
+    [hx2, hy1],     // rb
+    [hx1, hy2],     // lt
+    [hx2, hy2],     // rt
 ];
 
 module pcb() {
@@ -260,7 +260,7 @@ module box_outer() {
         cube(case_inner_dim + 2 * [case_T, case_T, case_T]);
 }
 
-module box() {
+module base_box() {
     difference() {
         union() {
             difference() {
@@ -280,9 +280,16 @@ module box() {
             );
         // TODO: outer round corner
         ;
+    }
+}
+
+module box() {
+    difference() {
+        base_box();
         // holes
         rj45_cutter();
         usb3_cutter();
+        pin_cutter();
     }
 }
 
@@ -327,9 +334,29 @@ module case_front() {
         box();
         translate([-10, -10, -30 + case_split_z])
             cube([case_inner_L, case_inner_W, 30] + [20, 20, 0]);
+        // observation window
+        if ($preview) {
+            translate([10, 20, 0])
+                cube([40, 30, 40]);
+        }
     }
     color("lightgreen")
         front_supporter();
+}
+
+pin_cutter_offset_lr = 2.5;
+pin_cutter_offset_tb = 3.0;
+
+module pin_cutter(clearance = 0) {
+    more = 10;
+    translate([pin_edge_to_board_left, hole_edge_to_board_bot + hole_D / 2 - 2.54 - more, board_T])
+        translate([clearance, clearance, clearance])
+            linear_extrude(30)
+                offset(pin_cutter_offset_lr, $fn=16)
+                    square(
+                        [20 * 2.54, 2 * 2.54 + pin_cutter_offset_tb - pin_cutter_offset_lr + more]
+                        - 2 * [clearance, clearance]
+                    );
 }
 
 front_supp_D = 4.0;
@@ -366,9 +393,10 @@ module board_supporter() {
 }
 
 module case_back() {
+    clearance = 0.1;
     difference() {
         box();
-        translate([-10, -10, case_split_z])
+        translate([-10, -10, case_split_z - clearance])
             cube([case_inner_L, case_inner_W, 30] + [20, 20, 0]);
         // holes
         typec_cutter();
@@ -378,11 +406,89 @@ module case_back() {
         board_supporter();
 }
 
-module case() {
-    case_front();
-    case_back();
+pin_supporter_T = 1.2;
+pin_supporter_offset = 0.4;
+
+module pin_supporter() {
+    clearance = 0.15;
+    w = front_supp_W + 2 * pin_supporter_T;
+    l = front_supp_L + 2 * pin_supporter_T;
+    translate([0, 0, board_T + clearance + 0.01])
+        difference() {
+            linear_extrude(case_gap_front - clearance)
+                offset(pin_supporter_offset, $fn=1)
+                    square([w, l] - 2 * [pin_supporter_offset, pin_supporter_offset], center=true);
+            cube([front_supp_W, front_supp_L, 40] + 2 * [clearance, clearance, 0], center=true);
+            translate([-4.6, 0, 17]) rotate([0, 45, 0])
+                cube([10, 10, 10], center=true);
+            translate([5, 0, 6])
+                cube([10, 10, 8], center=true);
+            translate([7.1, 0, 10]) rotate([0, 45, 0])
+                cube([10, 10, 10], center=true);
+            translate([0, -front_supp_L / 2 - clearance, 5])
+                cube([10, front_supp_L + 2 * clearance, 40]);
+        }
+
+    pin_supp_top();
+    mirror([0, 1, 0])
+        pin_supp_top();
+
+    pin_supp_bot();
+}
+
+module pin_supp_top() {
+    clearance = 0.15;
+    tri_sz = 3.23;
+    translate([front_supp_W / 2 + pin_supporter_T, front_supp_L / 2 + pin_supporter_T, board_T + case_gap_front - tri_sz])
+        translate([-pin_supporter_offset, 0, 0.01])
+        rotate([90, 0, 0])
+            linear_extrude(pin_supporter_T - clearance)
+                polygon([
+                    [0, 0], [tri_sz, tri_sz], [0, tri_sz],
+                ]);
+}
+
+module pin_supp_bot() {
+    clearance = 0.15;
+    tri_sz = 2.9;
+    translate([1.8, -front_supp_L / 2 - tri_sz - clearance, board_T + clearance + 0.01])
+            linear_extrude(2.0)
+                polygon([
+                    [0, 0], [tri_sz, 0], [0, tri_sz], [-tri_sz, tri_sz]
+                ]);
+}
+
+// !pin_supporter();
+
+module pin_serial_cutter() {
+    offset_v = 0.5;
+    linear_extrude(40)
+        translate([pin_edge_to_board_left + 15 * 2.54, hole_edge_to_board_bot + hole_D / 2 - 2.54])
+            offset(offset_v, $fn=1)
+                square([3 * 2.54, 2.54]);
+}
+
+module case_pin() {
+    // surface
+    difference() {
+        intersection() {
+            base_box();
+            pin_cutter(clearance = 0.15);
+        }
+        pin_serial_cutter();
+    }
+    // supporter
+    hole_pos_lb = [hx1, hy1];
+    hole_pos_rb = [hx2, hy1];
+    translate(hole_pos_lb)
+        pin_supporter();
+    translate(hole_pos_rb)
+        mirror([1, 0, 0])
+            pin_supporter();
 }
 
 case_front();
+case_pin();
+// pin40();
 board();
-// case_back();
+case_back();
