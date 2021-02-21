@@ -380,7 +380,7 @@ module front_supporter() {
 
 board_supp_outer_D = 6.0;
 board_supp_inner_D = 3.2;
-board_supp_hang = 0.2;
+board_supp_hang = 0.4;
 
 module board_supporter() {
     outer_h = case_gap_back + case_T + board_supp_hang;
@@ -438,7 +438,7 @@ module pin_supporter() {
 
 module pin_supp_top() {
     clearance = 0.15;
-    tri_sz = 3.23;
+    tri_sz = 3.08;
     translate([front_supp_W / 2 + pin_supporter_T, front_supp_L / 2 + pin_supporter_T, board_T + case_gap_front - tri_sz])
         translate([-pin_supporter_offset, 0, 0.01])
         rotate([90, 0, 0])
@@ -452,10 +452,10 @@ module pin_supp_bot() {
     clearance = 0.15;
     tri_sz = 2.9;
     translate([1.8, -front_supp_L / 2 - tri_sz - clearance, board_T + clearance + 0.01])
-            linear_extrude(2.0)
-                polygon([
-                    [0, 0], [tri_sz, 0], [0, tri_sz], [-tri_sz, tri_sz]
-                ]);
+        linear_extrude(2.0)
+            polygon([
+                [0, 0], [tri_sz, 0], [0, tri_sz], [-tri_sz, tri_sz]
+            ]);
 }
 
 // !pin_supporter();
