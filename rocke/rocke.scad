@@ -500,6 +500,22 @@ module case_pin() {
             pin_supporter();
 }
 
+// function animate_scale(t) = (cos(t * 180) + 1) / 2;
+function animate_scale(t) = exp(-t * 5);
+
+module demo() {
+    // echo("xxx", animate_scale($t), $t);
+    translate([0, 0, 40 * animate_scale($t)])
+        case_front();
+    translate([0, 0, 20 * animate_scale($t)])
+        case_pin();
+    board();
+    translate([0, 0, -20 * animate_scale($t)])
+        case_back();
+}
+
+// demo();
+
 case_front();
 case_pin();
 // pin40();
