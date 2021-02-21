@@ -278,8 +278,6 @@ module base_box() {
                 case_outer_round_R,
                 case_inner_dim + 2 * [case_T, case_T, case_T] + 2 * [epsilon, epsilon, epsilon]
             );
-        // TODO: outer round corner
-        ;
     }
 }
 
@@ -316,6 +314,14 @@ module round_edge_front_back(r, dim) {
         round_edge(z, r);
 }
 
+module round_corner(r, dir) {
+    difference() {
+        cube([r, r, r]);
+        translate(r * dir)
+            sphere(r, $fn=32);
+    }
+}
+
 module round_edge_12(r, dim) {
     x = dim[0];
     y = dim[1];
@@ -325,6 +331,13 @@ module round_edge_12(r, dim) {
         round_edge_front_back(r, [y, z, x]);
     rotate([0, 0, -90]) rotate([0, -90, 0])
         round_edge_front_back(r, [z, x, y]);
+
+    if (!$preview) {    // too slow, do not show rounded corner on preview
+        for (dx = [0, 1]) for (dy = [0, 1]) for (dz = [0, 1]) {
+            translate([dx * (x - r), dy * (y - r), dz * (z - r)])
+                round_corner(r, [1 - dx, 1 - dy, 1 - dz]);
+        }
+    }
 }
 
 case_split_z = board_T + case_gap_front - 2.0;
