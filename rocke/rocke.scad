@@ -353,8 +353,36 @@ module case_front() {
                 cube([40, 30, 40]);
         }
     }
-    color("lightgreen")
+    color("lightgreen") {
         front_supporter();
+        slugs();
+    }
+}
+
+module slugs() {
+    clearance = 0.1;
+    slug_H = 3;
+
+    for (x = [0, 1]) for (y = [0, 1]) {
+        off_x = (x - 1) * case_gap_left + x * (case_gap_right + board_L);
+        off_y = (y - 1) * case_gap_bot + y * (case_gap_top + board_W);
+        dir_x = -2 * x + 1;
+        dir_y = -2 * y + 1;
+        dir_off = case_inner_round_R + clearance;
+        pos = [off_x, off_y, board_T + case_gap_front - slug_H] + [dir_x * dir_off, dir_y * dir_off, 0];
+        angle = 90 * (x * (1 - y) + (1 - x) * y + 2 * y);
+        translate(pos)
+            rotate([0, 0, angle]) {
+                difference() {
+                    // rotate([0, 0, 22.5])
+                        cylinder(h=slug_H, r=case_inner_round_R, center=false, $fn=32);
+                    translate(case_inner_round_R * [-1, sin(45 / 4), -1])
+                        cube([5, 5, 5], center=false);
+                    translate(case_inner_round_R * [sin(45 / 4), -1, -1])
+                        cube([5, 5, 5], center=false);
+                }
+            }
+    }
 }
 
 pin_cutter_offset_lr = 2.5;
