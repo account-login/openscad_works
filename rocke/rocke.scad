@@ -207,13 +207,84 @@ module typec_cutter() {
             rotate([0, -90, 0])
                 linear_extrude(20) {
                     offset(gap) {
-                        square([6 + 10, 13]);
+                        square([6, 13]);
                     }
-                    // cut the near by jack hole
+                    // cut the nearby jack hole
                     square([6, 13 + 3]);
                 }
-            // cube([20, 13, 6]);
         }
+    }
+}
+
+snapfit_W = 6.0;
+snapfit_T = 1.5;
+snapfit_tooth_Z = 1.5;
+snapfit_tooth_X = 1.0;
+left_snapfit_H = 9.5;
+left_snapfit_ax_to_board_bot = typec_edge_to_board_bot + 6;
+right_snapfit_H = 9.5;
+right_snapfit_ax_to_board_top = 6;
+
+module left_snapfit_cutter() {
+    $fn = 4;
+    off = 0.15;
+    translate([-typec_hang, left_snapfit_ax_to_board_bot - snapfit_W / 2, board_T]) {
+        rotate([0, -90, 0])
+            linear_extrude(20) {
+                offset(off) {
+                    square([case_gap_front - left_snapfit_H + snapfit_tooth_Z, snapfit_W]);
+                }
+            }
+    }
+}
+
+module left_snapfit_arm() {
+    clearance = 0.1;
+    join = 0.1;
+    translate([-case_gap_left + clearance, typec_edge_to_board_bot + 3, case_gap_front + board_T - left_snapfit_H]) {
+        // arm
+        cube([snapfit_T, snapfit_W, left_snapfit_H + join]);
+        // tooth
+        translate([-snapfit_tooth_X, 0, 0])
+            cube([snapfit_tooth_X, snapfit_W, snapfit_tooth_Z]);
+    }
+}
+
+module right_snapfit_cutter() {
+    $fn = 4;
+    off = 0.15;
+    y = board_W - right_snapfit_ax_to_board_top - snapfit_W / 2;
+    z = board_T + case_gap_front - right_snapfit_H + snapfit_tooth_Z;
+    translate([board_L, y, z]) {
+        rotate([0, 90, 0])
+            linear_extrude(20)
+                offset(off) {
+                    polygon([
+                        [0, 0],
+                        [snapfit_tooth_Z, 0],
+                        [snapfit_tooth_Z + 0.5, 0.5],
+                        [snapfit_tooth_Z + 0.8, 1.2],
+                        [snapfit_tooth_Z + 0.8, snapfit_W - 1.2],
+                        [snapfit_tooth_Z + 0.5, snapfit_W - 0.5],
+                        [snapfit_tooth_Z, snapfit_W],
+                        [0, snapfit_W],
+                    ]);
+                    // square([snapfit_tooth_Z, snapfit_W]);
+                }
+    }
+}
+
+module right_snapfit_arm() {
+    clearance = 0.1;
+    join = 0.1;
+    x = board_L + case_gap_right - snapfit_T;
+    y = board_W - right_snapfit_ax_to_board_top - snapfit_W / 2;
+    translate([x - clearance, y, case_gap_front + board_T - right_snapfit_H]) {
+        // arm
+        cube([snapfit_T, snapfit_W, right_snapfit_H + join]);
+        // tooth
+        translate([snapfit_T, 0, 0])
+            cube([snapfit_tooth_X, snapfit_W, snapfit_tooth_Z]);
     }
 }
 
@@ -356,6 +427,8 @@ module case_front() {
     color("lightgreen") {
         front_supporter();
         slugs();
+        left_snapfit_arm();
+        right_snapfit_arm();
     }
 }
 
@@ -441,6 +514,8 @@ module case_back() {
             cube([case_inner_L, case_inner_W, 30] + [20, 20, 0]);
         // holes
         typec_cutter();
+        left_snapfit_cutter();
+        right_snapfit_cutter();
         jack_cutter();
     }
     color("lightgreen")
